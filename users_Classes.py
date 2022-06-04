@@ -3,7 +3,6 @@ import json
 file_name = "users.json"
 
 
-
 class User(object):
 
     def __init__(self, user):
@@ -19,7 +18,6 @@ class User(object):
 
     def check_unique(self, user):
         data = user.read_from_json()
-        print(data)
         result = True
         if len(data):
             for i in data:
@@ -43,7 +41,7 @@ class User(object):
         temp.append(user.__dict__)
         try:
             with open(file_name, 'w+') as f:
-                json.dump(temp, f, indent=2)
+                json.dump(temp, f, indent = 2)
                 print("write complite")
         except IOError:
-            print("write is not complete: "+file_name)
+            print("write is not complete: " + file_name)
