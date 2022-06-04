@@ -1,5 +1,7 @@
 import telebot
 import json
+
+from users_Classes import User
 import for_request
 import config
 
@@ -12,7 +14,9 @@ def send_welcome(message):
                      "Этот бот создается для удобства расчета покупок валюты, он может записывать и "
                      "анализировать записи покупок валюты и сравнивает ее с свежим курсом" + "\n\nКурс доллара на сегодня: "
                      + str(for_request.DOLLAR.get('Cur_OfficialRate')))
-
+    user = User(message.from_user)
+    if user.check_unique(user):
+        user.write_to_json(user)
 
 # content_types=['photo', 'text', "sticker", "pinned_message", "audio"]
 # func=lambda message: True
@@ -25,7 +29,7 @@ def echo_all(message):
 
 @bot.message_handler(content_types=['text'])
 def echo_all(message):
-    bot.send_message(message.chat.id, message.chat.first_name + " привет")
+    bot.send_message(message.from_user.id, message.chat.first_name + " привет")
     print(message.text)
 
 
