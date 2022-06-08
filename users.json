@@ -9,27 +9,5 @@
     "can_join_groups": null,
     "can_read_all_group_messages": null,
     "supports_inline_queries": null
-  },
-  {
-    "id": 420696107,
-    "is_bot": false,
-    "first_name": "Karuloz",
-    "last_name": null,
-    "username": "Karuloz",
-    "language_code": "ru",
-    "can_join_groups": null,
-    "can_read_all_group_messages": null,
-    "supports_inline_queries": null
-  },
-  {
-    "id": 595237689,
-    "is_bot": false,
-    "first_name": "Galaxy",
-    "last_name": null,
-    "username": "GalaxyAndromedaNebula",
-    "language_code": "ru",
-    "can_join_groups": null,
-    "can_read_all_group_messages": null,
-    "supports_inline_queries": null
   }
 ]
