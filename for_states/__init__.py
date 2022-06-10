@@ -1,1 +1,1 @@
-from .machine_state import Сurrency
+from .machine_state import Currency

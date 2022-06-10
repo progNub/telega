@@ -1,13 +1,15 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from for_states import Сurrency
+from for_states import Currency
 
 from models import User
 
 import keyboard
 
+
 async def analysis(message: types.Message):
-    await message.answer("Тут пока что кнопки не работают...", reply_markup=keyboard.buttons_analysis())
+    await message.answer("В процессе...")
+
 
 async def return_main_menu(message: types.Message, state: FSMContext):
     if message.chat.type == "private":
@@ -25,7 +27,7 @@ async def write_BYN(message: types.Message, state: FSMContext):
     if message.chat.type == "private":
         await state.update_data(state_run=message.text)
         await message.answer("Введи сумму в BYN")
-        await Сurrency.state_1.set()
+        await Currency.state_1.set()
 
 
 async def write_two_curr(message: types.Message, state: FSMContext):
@@ -36,15 +38,15 @@ async def write_two_curr(message: types.Message, state: FSMContext):
         if temp == "USD":
             await state.update_data(state_1=answer)
             await message.answer("Введи сумму в USD")
-            await Сurrency.state_2.set()
+            await Currency.state_2.set()
         elif temp == "EUR":
             await state.update_data(state_1=answer)
             await message.answer("Введи сумму в EUR")
-            await Сurrency.state_2.set()
+            await Currency.state_2.set()
         elif temp == "RUB":
             await state.update_data(state_1=answer)
             await message.answer("Введи сумму в RUB")
-            await Сurrency.state_2.set()
+            await Currency.state_2.set()
         else:
             await message.answer(f'Ошибка ввода данных, повторите попытку\nВведите сумму в{temp}')
 
@@ -72,6 +74,7 @@ async def start(message):
         if not User.check_unique(current_user):
             User.write_to_json(current_user)
             User.write_to_DB(current_user)
+            print(f"new user {message.from_user.user_name}")
         await message.answer(
             "Этот бот создается для удобства расчета покупок валюты, "
             "он может принимать записи и "

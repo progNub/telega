@@ -48,3 +48,4 @@ class User(object):
     @staticmethod
     def check_unique(user):
         return database.check_enique(user.id)
+

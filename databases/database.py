@@ -39,6 +39,11 @@ def read_query(connection, query):
     return result
 
 
+def delete_user(id_user):
+    delete_user = f"""DELETE FROM users WHERE id_telegram = '{id_user}' """
+    write_to_db(create_connection(), delete_user)
+
+
 def add_new_user(user):
     write_user = f"""INSERT INTO
         users ( id_telegram,
@@ -70,3 +75,21 @@ def check_enique(user_id):
 
 def get_users_by_key(key='*'):
     return read_query(create_connection(), f"select {key} from users;")
+
+
+def create_base_data_users():
+    create_table_database = """CREATE TABLE users
+        (
+            id INT AUTO_INCREMENT primary key not null,
+            id_telegram int not null UNIQUE,
+            is_bot bool,
+            first_name char(255),
+            last_name char(255),
+            username char(255),
+            language_code char(255),
+            can_join_groups char(255),
+            can_read_all_group_messages char(255),
+            supports_inline_queries char(255));"""
+    write_to_db(create_connection(), create_table_database)
+
+
