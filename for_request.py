@@ -1,7 +1,7 @@
 import requests
 import json
 
-file_name = "valuta.json"
+file_name = "databases/valuta.json"
 
 
 def get_rate(id="431"):

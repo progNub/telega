@@ -1,6 +1,6 @@
 import telebot
 from telebot import types
-from User import User
+from models.Class_User import User
 import for_request
 import config
 
@@ -21,11 +21,8 @@ def send_welcome(message):
     markup.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id,
                      text="Этот бот создается для удобства расчета покупок валюты, он может записывать и "
-                          "анализировать записи покупок валюты и сравнивает ее с свежим курсом по НБРБ",
+                          "анализировать записи покупок валюты",
                      reply_markup=markup)
-
-    # content_types = ['photo', 'text', "sticker", "pinned_message", "audio"]
-    # func = lambda message: True
 
 
 def echo_all(message):
@@ -55,11 +52,13 @@ def func(message):
         bot.send_message(id_user, text="сказать тебе что Деня-писюн")
 
     elif message.text == "Вернуться в главное меню":
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = types.ReplyKeyboardMarkup()
         btn1 = types.KeyboardButton("👋 Поздороваться")
         btn2 = types.KeyboardButton("❓ Задать вопрос")
-        btn3 = types.KeyboardButton("Курсы валют")
-        markup.add(btn1, btn2, btn3)
+        btn3 = types.KeyboardButton("❓ Курсы валют")
+        markup.add(btn1, btn2, btn2)
+        markup.add(btn2, btn2, btn2)
+        markup.add(btn3, btn2, btn2)
         bot.send_message(id_user, text="Вы вернулись в главное меню", reply_markup=markup)
     else:
         bot.send_message(id_user, text="На такую комманду я не запрограммировал..")

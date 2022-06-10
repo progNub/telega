@@ -1,7 +1,7 @@
 # bot info
 TOKEN = "5579850884:AAHfWR8fOm5KPeo-DfSZWTyse9aRaXc728g"
 
-# database info
+# databases info
 HOST_NAME = "localhost"
 USER_NAME = "root"
 USER_PASSWORD = "root"

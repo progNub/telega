@@ -1,7 +1,7 @@
 import json
-import database
+from databases import database
 
-file_name = "users.json"
+file_name = "../databases/users.json"
 
 
 class User(object):
@@ -27,7 +27,6 @@ class User(object):
         except IOError:
             print("file is non exists: " + file_name)
         return data
-
     @staticmethod
     def write_to_json(user):
         temp = User.read_from_json()
@@ -38,10 +37,10 @@ class User(object):
         except IOError:
             print("write is not complete: " + file_name)
 
+
     @staticmethod
     def write_to_DB(user):
         database.add_new_user(user)
-
     @staticmethod
     def get_users_from_DB(key="*"):
         return database.get_users_by_key(key)
