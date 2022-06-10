@@ -26,6 +26,7 @@ def get_all_rates():
     return temp
 
 
+
 def write_to_json():
     try:
         with open(file_name, 'w+') as f:
@@ -34,3 +35,4 @@ def write_to_json():
     except IOError:
         print("write is not complete: " + file_name)
 
+write_to_json()

@@ -57,8 +57,6 @@ async def answer_curr(message: types.Message, state: FSMContext):
     data = await state.get_data()
     BYN = data.get('state_1')
     TWO = data.get('state_2')
-    print(BYN)
-    print(TWO)
     await message.answer(f'ты ввел {TWO} = {BYN}')
     await state.finish()
 
@@ -71,10 +69,9 @@ async def hello(message):
 async def start(message):
     if message.chat.type == "private":
         current_user = User(message.from_user)
-        if not User.check_unique(current_user):
-            User.write_to_json(current_user)
+        if not User.check_unique(current_user.id):
+            print(f"новый юзер '{message.from_user.id}' '{message.from_user.username}'")
             User.write_to_DB(current_user)
-            print(f"new user {message.from_user.user_name}")
         await message.answer(
             "Этот бот создается для удобства расчета покупок валюты, "
             "он может принимать записи и "
