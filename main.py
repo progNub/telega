@@ -13,6 +13,7 @@ dp.register_message_handler(messages.analysis, regexp='Аналитика 🧮')
 dp.register_message_handler(messages.start, regexp='Инструкция ❓')
 
 # currency
+dp.register_message_handler(messages.main_menu, regexp='Вернуться')
 dp.register_message_handler(messages.write_BYN, regexp='USD')
 dp.register_message_handler(messages.write_BYN, regexp='EUR')
 dp.register_message_handler(messages.write_BYN, regexp='RUB')

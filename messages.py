@@ -12,10 +12,18 @@ async def analysis(message: types.Message):
     await message.answer("В процессе...")
 
 
-async def do_write(message):
+async def main_menu(message):
     if message.chat.type == "private":
-        await message.answer('Выберите о какой валюте вы хотите сделать запись:',
-                             reply_markup=keyboard.buttons_currency())
+        await message.answer(message.text, reply_markup=keyboard.buttons_start())
+
+
+async def do_write(message):
+    if message.text != "Вернуться":
+        if message.chat.type == "private":
+            await message.answer('Выберите о какой валюте вы хотите сделать запись:',
+                                 reply_markup=keyboard.buttons_currency())
+    else:
+        await message.answer(message.text, reply_markup=keyboard.buttons_start())
 
 
 async def write_BYN(message: types.Message, state: FSMContext):
@@ -30,29 +38,33 @@ async def write_BYN(message: types.Message, state: FSMContext):
 
 
 async def write_two_curr(message: types.Message, state: FSMContext):
-    answer = message.text
-    if message.chat.type == "private":
-        temp = await state.get_data()
-        temp = temp.get('state_run')
-        if temp == "USD":
-            await state.update_data(state_1=answer)
-            await message.answer("Введи сумму в USD")
-            await Currency.state_2.set()
-        elif temp == "EUR":
-            await state.update_data(state_1=answer)
-            await message.answer("Введи сумму в EUR")
-            await Currency.state_2.set()
-        elif temp == "RUB":
-            await state.update_data(state_1=answer)
-            await message.answer("Введи сумму в RUB")
-            await Currency.state_2.set()
-        else:
-            await message.answer(f'Ошибка ввода данных, повторите попытку\nВведите сумму в{temp}')
+    if message.text != "Вернуться":
+        answer = message.text
+        if message.chat.type == "private":
+            temp = await state.get_data()
+            temp = temp.get('state_run')
+            if temp == "USD":
+                await state.update_data(state_1=answer)
+                await message.answer("Введи сумму в USD")
+                await Currency.state_2.set()
+            elif temp == "EUR":
+                await state.update_data(state_1=answer)
+                await message.answer("Введи сумму в EUR")
+                await Currency.state_2.set()
+            elif temp == "RUB":
+                await state.update_data(state_1=answer)
+                await message.answer("Введи сумму в RUB")
+                await Currency.state_2.set()
+            else:
+                await message.answer(f'Ошибка ввода данных, повторите попытку\nВведите сумму в{temp}')
+    else:
+        await state.finish()
+        await message.answer(message.text, reply_markup=keyboard.buttons_start())
 
 
 async def answer_curr(message: types.Message, state: FSMContext):
-    answer = message.text
-    if answer != "Вернуться":
+    if message.text != "Вернуться":
+        answer = message.text
         await state.update_data(state_2=answer)
         data = await state.get_data()
         byn = float(data.get('state_1'))
