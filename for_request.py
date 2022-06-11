@@ -35,4 +35,3 @@ def write_to_json():
     except IOError:
         print("write is not complete: " + file_name)
 
-write_to_json()

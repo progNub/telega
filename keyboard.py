@@ -5,12 +5,24 @@ from aiogram.types import ReplyKeyboardRemove, \
 
 def buttons_analysis():
     btn1 = KeyboardButton('Общая информация')
-    btn2 = KeyboardButton('Выбрать валюту')
+    btn2 = KeyboardButton('Список записей')
     btn3 = KeyboardButton('Курсы валют')
     btn4 = KeyboardButton("Вернуться")
     keys = ReplyKeyboardMarkup(resize_keyboard=True)
-    keys.add(btn1, btn2)(btn3, btn4)
+    keys.add(btn1, btn2)
+    keys.add(btn3, btn4)
     return keys
+
+
+# def button_information_writes():
+#     btn1 = KeyboardButton('Список всех записей')
+#     btn2 = KeyboardButton('Изменить запись')
+#     btn3 = KeyboardButton('Удалить')
+#     btn4 = KeyboardButton("Вернуться в предыдущее меню")
+#     keys = ReplyKeyboardMarkup(resize_keyboard=True)
+#     keys.add(btn1, btn2)
+#     keys.add(btn3, btn4)
+#     return keys
 
 
 def buttons_start():

@@ -106,3 +106,4 @@ class User(object):
 #             json.dump(temp, f, indent=2)
 #     except IOError:
 #         print("write is not complete: " + file_name_users)
+

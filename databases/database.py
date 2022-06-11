@@ -12,6 +12,7 @@ def create_connection(host_name=HOST_NAME, user_name=USER_NAME, user_password=US
             user=user_name,
             passwd=user_password,
             database=db_name)
+
     except Error as e:
         print(f"error '{e}' ")
     return connection
@@ -26,7 +27,8 @@ def write_to_db(query, connection=create_connection()):
         print(f"error '{e}'")
 
 
-def read_query(query, connection = create_connection()):
+def read_query(query, connection=create_connection()):
+    connection.reconnect()
     cursor = connection.cursor()
     result = None
     try:
@@ -36,9 +38,3 @@ def read_query(query, connection = create_connection()):
     except Error as e:
         print(f"Error '{e}'")
     return result
-
-
-
-
-
-
