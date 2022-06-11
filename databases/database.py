@@ -21,7 +21,6 @@ def write_to_db(query, connection=create_connection()):
     cursor = connection.cursor()
     try:
         cursor.execute(query)
-        print("select completed")
         connection.commit()
     except Error as e:
         print(f"error '{e}'")

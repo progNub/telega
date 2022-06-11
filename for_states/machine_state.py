@@ -7,3 +7,7 @@ class Currency(StatesGroup):
     state_1 = State()
     state_2 = State()
     state_run = State()
+
+
+class Analitics(StatesGroup):
+    state_1 = State()

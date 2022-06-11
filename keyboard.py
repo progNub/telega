@@ -3,15 +3,14 @@ from aiogram.types import ReplyKeyboardRemove, \
     InlineKeyboardMarkup, InlineKeyboardButton
 
 
-# def buttons_analysis():
-#     btn1 = KeyboardButton('Общая информация')
-#     btn2 = KeyboardButton('Выбрать валюту')
-#     btn3 = KeyboardButton('Курсы валют')
-#     btn4 = KeyboardButton("Вернуться")
-#     keys = ReplyKeyboardMarkup(resize_keyboard=True)
-#     keys.add(btn1, btn2)
-#     keys.add(btn3, btn4)
-#     return keys
+def buttons_analysis():
+    btn1 = KeyboardButton('Общая информация')
+    btn2 = KeyboardButton('Выбрать валюту')
+    btn3 = KeyboardButton('Курсы валют')
+    btn4 = KeyboardButton("Вернуться")
+    keys = ReplyKeyboardMarkup(resize_keyboard=True)
+    keys.add(btn1, btn2)(btn3, btn4)
+    return keys
 
 
 def buttons_start():

@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from for_states import Currency
 
+from models import Money
 from models import User
 
 import keyboard
@@ -11,12 +12,6 @@ async def analysis(message: types.Message):
     await message.answer("В процессе...")
 
 
-async def return_main_menu(message: types.Message, state: FSMContext):
-    if message.chat.type == "private":
-        await state.finish()
-        await message.answer(message.text, reply_markup=keyboard.buttons_start())
-
-
 async def do_write(message):
     if message.chat.type == "private":
         await message.answer('Выберите о какой валюте вы хотите сделать запись:',
@@ -24,15 +19,19 @@ async def do_write(message):
 
 
 async def write_BYN(message: types.Message, state: FSMContext):
-    if message.chat.type == "private":
-        await state.update_data(state_run=message.text)
-        await message.answer("Введи сумму в BYN")
-        await Currency.state_1.set()
+    if message.text != "Вернуться":
+        if message.chat.type == "private":
+            await state.update_data(state_run=message.text)
+            await message.answer("Введи сумму в BYN")
+            await Currency.state_1.set()
+    else:
+        await state.finish()
+        await message.answer(message.text, reply_markup=keyboard.buttons_start())
 
 
 async def write_two_curr(message: types.Message, state: FSMContext):
+    answer = message.text
     if message.chat.type == "private":
-        answer = message.text
         temp = await state.get_data()
         temp = temp.get('state_run')
         if temp == "USD":
@@ -53,12 +52,27 @@ async def write_two_curr(message: types.Message, state: FSMContext):
 
 async def answer_curr(message: types.Message, state: FSMContext):
     answer = message.text
-    await state.update_data(state_2=answer)
-    data = await state.get_data()
-    BYN = data.get('state_1')
-    TWO = data.get('state_2')
-    await message.answer(f'ты ввел {TWO} = {BYN}')
-    await state.finish()
+    if answer != "Вернуться":
+        await state.update_data(state_2=answer)
+        data = await state.get_data()
+        byn = float(data.get('state_1'))
+        TWO = float(data.get('state_2'))
+        temp = await state.get_data()
+        temp = temp.get('state_run')
+        tmoney = Money()
+        if temp == "USD":
+            tmoney.set_money(BYN=byn, USD=TWO)
+        elif temp == "EUR":
+            tmoney.set_money(BYN=byn, EUR=TWO)
+        elif temp == "RUB":
+            tmoney.set_money(BYN=byn, RUB=TWO)
+        Money.add_money(user_id=message.from_user.id, money=tmoney)
+        await message.answer(
+            f'ты ввел {TWO} = {byn}, всего записей: {len(Money.get_monet_from_db(message.from_user.id))}')
+        await state.finish()
+    else:
+        await state.finish()
+        await message.answer(message.text, reply_markup=keyboard.buttons_start())
 
 
 async def hello(message):
