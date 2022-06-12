@@ -26,29 +26,33 @@ class Money(object):
 
     @staticmethod
     def get_list_writes_str(user_id):
+        result_str = ''
         usd = Money.get_usd(user_id)
         rub = Money.get_rub(user_id)
         eur = Money.get_eur(user_id)
-        str_usd = "BYN - USD\n"
-        str_eur = "BYN - EUR\n"
-        str_rub = "BYN - RUB\n"
-        count1 = 0
-        count2 = 0
-        count3 = 0
+        str_usd = "{:>6}  {:>12} {:>8}\n".format("BYN", "USD", "Курс")
+        str_eur = "{:>6}  {:>12} {:>8}\n".format("BYN", "EUR", "Курс")
+        str_rub = "{:>6}  {:>12} {:>8}\n".format("BYN", "RUB", "Курс")
+        count_usd = count_eur = count_rub = 0
         for i in usd:
-            count1 += 1
-            str_usd += "{}. {:^10.3f} : {:^10.3f}\n".format(count1, i[0], i[1])
+            count_usd += 1
+            str_usd += "{}. {:<8}{:^3}{:>8} : {}\n".format(count_usd, i[0], '=', i[1],  i[2])
         str_usd += "\n"
         for i in eur:
-            count2 += 1
-            str_eur += "{}. {:^10.3f} : {:^10.3f}\n".format(count2, i[0], i[1])
+            count_eur += 1
+            str_eur += "{}. {:<8}{:^3}{:>8} : {}\n".format(count_eur, i[0], '=', i[1],  i[2])
         str_eur += "\n"
         for i in rub:
-            count3 += 1
-            str_rub += "{}. {:^10.3f} : {:^10.3f}\n".format(count3, i[0], i[1])
+            count_rub += 1
+            str_rub += "{}. {:<8}{:^3}{:>8} : {}\n".format(count_rub, i[0], '=', i[1],  i[2])
         str_rub += "\n"
-
-        return str_usd + str_eur + str_rub
+        if count_usd != 0:
+            result_str += str_usd
+        if count_eur != 0:
+            result_str += str_eur
+        if count_rub != 0:
+            result_str += str_rub
+        return result_str
 
     @staticmethod
     def get_sum_money_str(user_id):
@@ -59,11 +63,17 @@ class Money(object):
             rub += i[4]
             usd += i[5]
             eur += i[6]
-        string_byn = f"Общая сумма потраченых: BYN = '{byn}'\n"
-        string_eur = f"Общая сумма купленных:  EUR = '{eur}'\n"
-        string_usd = f"Общая сумма купленных:  USD = '{usd}'\n"
-        string_rub = f"Общая сумма купленных:  RUB = '{rub}'\n"
-        return string_byn + string_eur + string_usd + string_rub
+        result_str = string_byn = "Общая сумма: BYN = {:>.2f}\n".format(byn)
+        string_eur = "Общая сумма: EUR = {:>.2f}\n".format(eur)
+        string_usd = "Общая сумма: USD = {:>.2f}\n".format(usd)
+        string_rub = "Общая сумма: RUB = {:>.2f}\n".format(rub)
+        if not rub == 0:
+            result_str += string_rub
+        if not eur == 0:
+            result_str += string_eur
+        if not usd == 0:
+            result_str += string_usd
+        return result_str
 
     @staticmethod
     def _get_curs(BYN=0, RUB=0, USD=0, EUR=0):
@@ -127,6 +137,3 @@ class Money(object):
     def checking_null(id_user):
         sql = f"""select * from money where user_id = '{id_user}'"""
         return bool(len(read_query(sql)))
-
-Money.drop_table_money()
-Money.create_table_money()

@@ -10,7 +10,7 @@ dp.register_message_handler(messages.start, Command('start'))
 dp.register_message_handler(messages.hello, regexp='Привет! 👋')
 dp.register_message_handler(messages.do_write, regexp='Сделать запись ✍')
 dp.register_message_handler(messages.analysis, regexp='Аналитика 🧮')
-dp.register_message_handler(messages.start, regexp='Инструкция ❓')
+dp.register_message_handler(messages.start, regexp='Информация ❓')
 
 # currency
 dp.register_message_handler(messages.main_menu, regexp='Вернуться')
@@ -24,6 +24,7 @@ dp.register_message_handler(messages.answer_curr, state=Currency.state_2)
 dp.register_message_handler(messages.common_information, regexp='Общая информация')
 dp.register_message_handler(messages.list_writes, regexp='Список записей')
 dp.register_message_handler(messages.get_curr, regexp='Курсы валют')
+dp.register_message_handler(messages.random_message, content_types=['text'])
 
 
 

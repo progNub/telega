@@ -1,4 +1,5 @@
 from aiogram import types
+
 from aiogram.dispatcher import FSMContext
 from for_states import Currency
 import for_request
@@ -9,13 +10,25 @@ from models import User
 import keyboard
 
 
+def _get_pre(line):
+    return f"<pre>{line}</pre>"
+
+
+def _checking_for_correct(checking):
+    try:
+        checking = float(checking)
+        return True
+    except:
+        return False
+
+
 async def analysis(message):
     await message.answer(message.text, reply_markup=keyboard.buttons_analysis())
 
 
 async def common_information(message: types.Message):
     if Money.checking_null(message.from_user.id):
-        await message.answer(Money.get_sum_money_str(message.from_user.id))
+        await message.answer(_get_pre(Money.get_sum_money_str(message.from_user.id)), parse_mode=types.ParseMode.HTML)
     else:
         await message.answer("У вас еще нет ни одной записи")
 
@@ -48,7 +61,7 @@ async def write_BYN(message: types.Message, state: FSMContext):
     if message.text != "Вернуться":
         if message.chat.type == "private":
             await state.update_data(state_run=message.text)
-            await message.answer("Введи сумму в BYN")
+            await message.answer("Введи сумму в BYN", reply_markup=keyboard.buttons_currency_redaction())
             await Currency.state_1.set()
     else:
         await state.finish()
@@ -58,23 +71,28 @@ async def write_BYN(message: types.Message, state: FSMContext):
 async def write_two_curr(message: types.Message, state: FSMContext):
     if message.text != "Вернуться":
         answer = message.text
-        if message.chat.type == "private":
-            temp = await state.get_data()
-            temp = temp.get('state_run')
-            if temp == "USD":
-                await state.update_data(state_1=answer)
-                await message.answer("Введи сумму в USD")
-                await Currency.state_2.set()
-            elif temp == "EUR":
-                await state.update_data(state_1=answer)
-                await message.answer("Введи сумму в EUR")
-                await Currency.state_2.set()
-            elif temp == "RUB":
-                await state.update_data(state_1=answer)
-                await message.answer("Введи сумму в RUB")
-                await Currency.state_2.set()
-            else:
-                await message.answer(f'Ошибка ввода данных, повторите попытку\nВведите сумму в{temp}')
+        if _checking_for_correct(answer):
+            if message.chat.type == "private":
+                temp = await state.get_data()
+                temp = temp.get('state_run')
+                if temp == "USD":
+                    await state.update_data(state_1=answer)
+                    await message.answer("Введи сумму в USD")
+                    await Currency.state_2.set()
+                elif temp == "EUR":
+                    await state.update_data(state_1=answer)
+                    await message.answer("Введи сумму в EUR")
+                    await Currency.state_2.set()
+                elif temp == "RUB":
+                    await state.update_data(state_1=answer)
+                    await message.answer("Введи сумму в RUB")
+                    await Currency.state_2.set()
+                else:
+                    await message.answer(f'Ошибка ввода данных, повторите попытку\nВведите сумму в{temp}')
+        else:
+            await state.finish()
+            await message.answer("Неверный формат данных", reply_markup=keyboard.buttons_currency())
+
     else:
         await state.finish()
         await message.answer(message.text, reply_markup=keyboard.buttons_start())
@@ -83,23 +101,31 @@ async def write_two_curr(message: types.Message, state: FSMContext):
 async def answer_curr(message: types.Message, state: FSMContext):
     if message.text != "Вернуться":
         answer = message.text
-        await state.update_data(state_2=answer)
-        data = await state.get_data()
-        byn = float(data.get('state_1'))
-        two = float(data.get('state_2'))
-        temp = await state.get_data()
-        temp = temp.get('state_run')
-        tmoney = Money()
-        if temp == "USD":
-            tmoney.set_money(BYN=byn, USD=two)
-        elif temp == "EUR":
-            tmoney.set_money(BYN=byn, EUR=two)
-        elif temp == "RUB":
-            tmoney.set_money(BYN=byn, RUB=two)
-        Money.add_money(user_id=message.from_user.id, money=tmoney)
-        await message.answer(
-            f'ты ввел {two} = {byn}, всего записей: {len(Money.get_monet_from_db(message.from_user.id))}')
-        await state.finish()
+        if _checking_for_correct(answer):
+            await state.update_data(state_2=answer)
+            data = await state.get_data()
+            byn = float(data.get('state_1'))
+            two = float(data.get('state_2'))
+            tempCurr = await state.get_data()
+            tempCurr = tempCurr.get('state_run')
+            tmoney = Money()
+            if tempCurr == "USD":
+                tmoney.set_money(BYN=byn, USD=two)
+            elif tempCurr == "EUR":
+                tmoney.set_money(BYN=byn, EUR=two)
+            elif tempCurr == "RUB":
+                tmoney.set_money(BYN=byn, RUB=two)
+            Money.add_money(user_id=message.from_user.id, money=tmoney)
+            a = byn / two
+            result_str = f"Вы купили {two} {tempCurr} за {byn} BYN, курс покупки: " + "{:.5f}".format(
+                a) + "\n" + f'Всего записей: {len(Money.get_monet_from_db(message.from_user.id))}'
+            await message.answer(
+                result_str,
+                reply_markup=keyboard.buttons_currency())
+            await state.finish()
+        else:
+            await state.finish()
+            await message.answer("Неверный формат данных", reply_markup=keyboard.buttons_currency())
     else:
         await state.finish()
         await message.answer(message.text, reply_markup=keyboard.buttons_start())
@@ -107,19 +133,22 @@ async def answer_curr(message: types.Message, state: FSMContext):
 
 async def hello(message):
     if message.chat.type == "private":
-        await message.answer(f"Привет {message.from_user.first_name}")
+        await message.answer(f"Привет {message.from_user.first_name}", reply_markup=keyboard.buttons_start())
 
 
 async def start(message):
     if message.chat.type == "private":
+        welcom = ""
         current_user = User(message.from_user)
         if not User.check_unique(current_user.id):
             print(f"новый юзер '{message.from_user.id}' '{message.from_user.username}'")
             User.write_to_DB(current_user)
+            welcom = f"Приветствую тебя {message.from_user.first_name}, в ряду новых пользователей)\n\n"
         await message.answer(
-            "Этот бот создается для удобства расчета покупок валюты, "
-            "он может принимать записи и "
-            "анализировать их", reply_markup=keyboard.buttons_start())
+            welcom+"Этот бот создан для облегчения ведения учета покупок валюты "
+            "он умеет хранить и обрабатывать информацию об этих покупках.\n"
+            "Сейчас доступно 3 валюты для записи: RUB, USD, EUR",
+            reply_markup=keyboard.buttons_start())
 
 
 # async def information_about_writes(message: types.Message):
@@ -128,6 +157,11 @@ async def start(message):
 
 async def list_writes(message: types.Message):
     if Money.checking_null(message.from_user.id):
-        await message.answer(Money.get_list_writes_str(message.from_user.id))
+        await message.answer(_get_pre(Money.get_list_writes_str(message.from_user.id)),
+                             parse_mode=types.ParseMode.HTML)
     else:
         await message.answer("У вас еще нет ни одной записи")
+
+
+async def random_message(message: types.Message):
+    await message.answer("Нет такой комманды")
