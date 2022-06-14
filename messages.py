@@ -1,8 +1,9 @@
 from aiogram import types
 
 from aiogram.dispatcher import FSMContext
-from for_states import Currency
+from for_states import Currency, Analitics
 import for_request
+from loader import bot
 
 from models import Money
 from models import User
@@ -22,8 +23,8 @@ def _checking_for_correct(checking):
         return False
 
 
-async def analysis(message):
-    await message.answer(message.text, reply_markup=keyboard.buttons_analysis())
+async def analysis(message: types.Message):
+    await message.answer("Меню аналитики 🧮", reply_markup=keyboard.buttons_analysis())
 
 
 async def common_information(message: types.Message):
@@ -43,12 +44,12 @@ async def get_curr(message: types.Message):
                          f"EUR  :  {eur}")
 
 
-async def main_menu(message):
+async def main_menu(message: types.Message):
     if message.chat.type == "private":
-        await message.answer(message.text, reply_markup=keyboard.buttons_start())
+        await message.answer("Вернул", reply_markup=keyboard.buttons_start())
 
 
-async def do_write(message):
+async def do_write(message: types.Message):
     if message.text != "Вернуться":
         if message.chat.type == "private":
             await message.answer('Выберите о какой валюте вы хотите сделать запись:',
@@ -131,24 +132,24 @@ async def answer_curr(message: types.Message, state: FSMContext):
         await message.answer(message.text, reply_markup=keyboard.buttons_start())
 
 
-async def hello(message):
+async def hello(message: types.Message):
     if message.chat.type == "private":
         await message.answer(f"Привет {message.from_user.first_name}", reply_markup=keyboard.buttons_start())
 
 
-async def start(message):
+async def start(message: types.Message):
     if message.chat.type == "private":
-        welcom = ""
+        welcom = "Этот бот создан для облегчения ведения учета покупок валюты " \
+                 "он умеет хранить и обрабатывать информацию об этих покупках.\n" \
+                 "Сейчас доступно 3 валюты для записи: RUB, USD, EUR.\n\n"
         current_user = User(message.from_user)
         if not User.check_unique(current_user.id):
-            print(f"новый юзер '{message.from_user.id}' '{message.from_user.username}'")
+            print(f"Новый юзер '{message.from_user.id}' '{message.from_user.username}'")
             User.write_to_DB(current_user)
-            welcom = f"Приветствую тебя {message.from_user.first_name}, в ряду новых пользователей)\n\n"
-        await message.answer(
-            welcom+"Этот бот создан для облегчения ведения учета покупок валюты "
-            "он умеет хранить и обрабатывать информацию об этих покупках.\n"
-            "Сейчас доступно 3 валюты для записи: RUB, USD, EUR",
-            reply_markup=keyboard.buttons_start())
+            welcom = f"Приветствую тебя {message.from_user.first_name}, в ряду новых пользователей)\n\n" + welcom
+        if Money.checking_null(message.from_user.id):
+            welcom += "Для удаления записей введите комманду /delete"
+    await message.answer(welcom, reply_markup=keyboard.buttons_start())
 
 
 # async def information_about_writes(message: types.Message):
@@ -163,5 +164,24 @@ async def list_writes(message: types.Message):
         await message.answer("У вас еще нет ни одной записи")
 
 
-async def random_message(message: types.Message):
-    await message.answer("Нет такой комманды")
+
+
+
+async def show_button_delete_writes(callback_query: types.CallbackQuery):
+    if Money.checking_null(callback_query.from_user.id):
+        await bot.send_message(callback_query.from_user.id, "Сделайте выбор:\n",
+                           reply_markup=keyboard.button_delete_writes_user())
+
+
+async def delete_writes(callback_query: types.CallbackQuery):
+    if Money.checking_null(callback_query.from_user.id):
+        Money.delete_all_writes_about_money(callback_query.from_user.id)
+        await bot.answer_callback_query(
+            callback_query.id,
+            text='Все записи удалены', show_alert=True)
+
+
+async def cancel_delete(callback_query: types.CallbackQuery):
+    if Money.checking_null(callback_query.from_user.id):
+        message = callback_query.message
+        await bot.delete_message(message.chat.id, message.message_id)

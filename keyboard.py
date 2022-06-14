@@ -3,6 +3,7 @@ from aiogram.types import ReplyKeyboardRemove, \
     InlineKeyboardMarkup, InlineKeyboardButton
 
 
+
 def buttons_analysis():
     btn1 = KeyboardButton('Общая информация')
     btn2 = KeyboardButton('Список записей')
@@ -55,3 +56,14 @@ def buttons_currency_redaction():
     keys.add(btn1, btn2)
     keys.add(btn3, btn4)
     return keys
+
+
+
+
+def button_delete_writes_user():
+    btn_1 = InlineKeyboardButton('Удалить записи', callback_data='delete_writes')
+    btn_2 = InlineKeyboardButton('Отменить', callback_data='cancel')
+    inline_kb1 = InlineKeyboardMarkup()
+    inline_kb1.add(btn_1)
+    inline_kb1.add(btn_2)
+    return inline_kb1

@@ -10,41 +10,37 @@ class Money(object):
         self.EUR = EUR
 
     @staticmethod
-    def get_usd(user_id):
-        sql = f"""SELECT byn, usd, curs FROM money WHERE user_id = {user_id} AND usd > 0"""
-        return read_query(sql)
-
-    @staticmethod
-    def get_rub(user_id):
-        sql = f"""SELECT byn, rub, curs FROM money WHERE user_id = {user_id} AND rub > 0"""
-        return read_query(sql)
-
-    @staticmethod
-    def get_eur(user_id):
-        sql = f"""SELECT byn, eur, curs FROM money WHERE user_id = {user_id} AND eur > 0"""
+    def get_curr_and_curs(user_id, usd=False, eur=False, rub=False):
+        sql = ""
+        if usd:
+            sql = f"""SELECT byn, usd, curs FROM money WHERE user_id = {user_id} AND usd > 0"""
+        elif rub:
+            sql = f"""SELECT byn, rub, curs FROM money WHERE user_id = {user_id} AND rub > 0"""
+        elif eur:
+            sql = f"""SELECT byn, eur, curs FROM money WHERE user_id = {user_id} AND eur > 0"""
         return read_query(sql)
 
     @staticmethod
     def get_list_writes_str(user_id):
         result_str = ''
-        usd = Money.get_usd(user_id)
-        rub = Money.get_rub(user_id)
-        eur = Money.get_eur(user_id)
-        str_usd = "{:>6}  {:>12} {:>8}\n".format("BYN", "USD", "Курс")
-        str_eur = "{:>6}  {:>12} {:>8}\n".format("BYN", "EUR", "Курс")
-        str_rub = "{:>6}  {:>12} {:>8}\n".format("BYN", "RUB", "Курс")
+        usd = Money.get_curr_and_curs(user_id, usd=True)
+        rub = Money.get_curr_and_curs(user_id, rub=True)
+        eur = Money.get_curr_and_curs(user_id, eur=True)
+        str_usd = "{:>6}  {:>9} {:>11}\n".format("BYN", "USD", "Курс")
+        str_eur = "{:>6}  {:>9} {:>11}\n".format("BYN", "EUR", "Курс")
+        str_rub = "{:>6}  {:>9} {:>11}\n".format("BYN", "RUB", "Курс")
         count_usd = count_eur = count_rub = 0
         for i in usd:
             count_usd += 1
-            str_usd += "{}. {:<8}{:^3}{:>8} : {}\n".format(count_usd, i[0], '=', i[1],  i[2])
+            str_usd += "{}. {:<8}{:^3}{:<8} : {:>}\n".format(count_usd, i[0], '=', i[1], i[2])
         str_usd += "\n"
         for i in eur:
             count_eur += 1
-            str_eur += "{}. {:<8}{:^3}{:>8} : {}\n".format(count_eur, i[0], '=', i[1],  i[2])
+            str_eur += "{}. {:<8}{:^3}{:<8} : {:>}\n".format(count_eur, i[0], '=', i[1], i[2])
         str_eur += "\n"
         for i in rub:
             count_rub += 1
-            str_rub += "{}. {:<8}{:^3}{:>8} : {}\n".format(count_rub, i[0], '=', i[1],  i[2])
+            str_rub += "{}. {:<8}{:^3}{:<8} : {:>}\n".format(count_rub, i[0], '=', i[1], i[2])
         str_rub += "\n"
         if count_usd != 0:
             result_str += str_usd
@@ -63,10 +59,10 @@ class Money(object):
             rub += i[4]
             usd += i[5]
             eur += i[6]
-        result_str = string_byn = "Общая сумма: BYN = {:>.2f}\n".format(byn)
-        string_eur = "Общая сумма: EUR = {:>.2f}\n".format(eur)
-        string_usd = "Общая сумма: USD = {:>.2f}\n".format(usd)
-        string_rub = "Общая сумма: RUB = {:>.2f}\n".format(rub)
+        result_str = string_byn = "Затрачено: BYN = {:>.2f}\n\n".format(byn)
+        string_eur = "Куплено: EUR = {:>.2f}\n".format(eur)
+        string_usd = "Куплено: USD = {:>.2f}\n".format(usd)
+        string_rub = "Куплено: RUB = {:>.2f}\n".format(rub)
         if not rub == 0:
             result_str += string_rub
         if not eur == 0:
@@ -116,7 +112,7 @@ class Money(object):
 
     @staticmethod
     def drop_table_money():
-        sql_del = """drop table money;"""
+        sql_del = "drop table money;"
         write_to_db(sql_del)
 
     @staticmethod
@@ -130,10 +126,18 @@ class Money(object):
 
     @staticmethod
     def get_monet_from_db(user_id):
-        sql = f"""select * from money WHERE user_id = {user_id};"""
+        sql = f"select * from money WHERE user_id = {user_id};"
         return read_query(sql)
 
     @staticmethod
     def checking_null(id_user):
-        sql = f"""select * from money where user_id = '{id_user}'"""
+        sql = f"select * from money where user_id = '{id_user}'"
         return bool(len(read_query(sql)))
+
+    @staticmethod
+    def delete_all_writes_about_money(id_user):
+        sql = f"delete from money where user_id = {id_user};"
+        result = write_to_db(sql)
+        if not result:
+            print(f"не получилось удалить записи пользователя под id = {id_user}")
+        return result

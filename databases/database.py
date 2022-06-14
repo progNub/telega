@@ -23,8 +23,10 @@ def write_to_db(query, connection=create_connection()):
     try:
         cursor.execute(query)
         connection.commit()
+        return True
     except Error as e:
         print(f"error '{e}'")
+        return False
 
 
 def read_query(query, connection=create_connection()):
